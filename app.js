@@ -138,7 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const mainReasonsList = document.getElementById('mainReasonsList');
     const redFlagsList = document.getElementById('redFlagsList');
 
-    const GEMINI_API_KEY = 'AIzaSyCT8iwAYDVH6zzfQ4sGrFbDCOkFeUwCzJk';
+    const GEMINI_API_KEY_VAR = ''; // removed hardcoded key
 
     const fileToBase64 = (file) => new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -147,7 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
         reader.onerror = error => reject(error);
     });
 
-    const callGeminiAPI = async (jdText, cvText, jdBase64, jdMime, cvBase64, cvMime) => {
+    const callGeminiAPI = async (jdText, cvText, jdBase64, jdMime, cvBase64, cvMime, apiKey) => {
         const parts = [
             { text: "Bạn là một chuyên gia nhân sự (HR) cấp cao tại M12 Sorting Centers. Hãy phân tích CV của ứng viên so với Mô tả công việc (JD) sau đây và trả về KẾT QUẢ DƯỚI DẠNG JSON TUYỆT ĐỐI THEO FORMAT BÊN DƯỚI, KHÔNG CÓ BẤT KỲ VĂN BẢN NÀO KHÁC BÊN NGOÀI JSON.\n\n" }
         ];
@@ -221,7 +221,7 @@ Format JSON bắt buộc (Chỉ trả về JSON, không kèm bất kỳ đoạn 
             }
         };
 
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(requestBody)
@@ -240,7 +240,34 @@ Format JSON bắt buộc (Chỉ trả về JSON, không kèm bất kỳ đoạn 
         return JSON.parse(textResponse);
     };
 
+    const apiKeyInput = document.getElementById('apiKeyInput');
+    const saveKeyBtn = document.getElementById('saveKeyBtn');
+
+    // Load saved key
+    const savedKey = localStorage.getItem('gemini_api_key');
+    if (savedKey) {
+        apiKeyInput.value = savedKey;
+    }
+
+    saveKeyBtn.addEventListener('click', () => {
+        const key = apiKeyInput.value.trim();
+        if (key) {
+            localStorage.setItem('gemini_api_key', key);
+            alert('✅ Đã lưu API Key an toàn trên trình duyệt của bạn!');
+        } else {
+            localStorage.removeItem('gemini_api_key');
+            alert('Đã xóa API Key!');
+        }
+    });
+
     analyzeBtn.addEventListener('click', async () => {
+        const currentApiKey = apiKeyInput.value.trim();
+        if (!currentApiKey) {
+            alert('⚠️ Vui lòng nhập API Key của Gemini vào ô trên cùng để sử dụng tính năng này!');
+            apiKeyInput.focus();
+            return;
+        }
+
         if (!validateInputs()) return;
 
         loadingOverlay.classList.remove('hidden');
@@ -269,7 +296,7 @@ Format JSON bắt buộc (Chỉ trả về JSON, không kèm bất kỳ đoạn 
                 cvMime = res.mime;
             }
 
-            const result = await callGeminiAPI(jdText, cvText, jdBase64, jdMime, cvBase64, cvMime);
+            const result = await callGeminiAPI(jdText, cvText, jdBase64, jdMime, cvBase64, cvMime, currentApiKey);
             renderResults(result);
         } catch (err) {
             console.error(err);
