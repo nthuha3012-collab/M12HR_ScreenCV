@@ -40,6 +40,14 @@
 
     <!-- ===== MAIN ===== -->
     <div class="app-container">
+        
+        <!-- API Key Input Section -->
+        <div class="api-key-section" style="margin-bottom: 1.5rem; padding: 1rem; background: var(--card-bg); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); display: flex; gap: 10px; align-items: center;">
+            <i class="ph ph-key" style="color: var(--primary); font-size: 1.4rem;"></i>
+            <input type="password" id="apiKeyInput" placeholder="Nhập API Key của Google Gemini vào đây..." style="flex: 1; padding: 0.6rem 1rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-family: 'Quicksand', sans-serif; font-size: 0.95rem;">
+            <button id="saveKeyBtn" style="padding: 0.6rem 1.2rem; background: var(--primary); color: white; border: none; border-radius: var(--radius-sm); cursor: pointer; font-weight: 600; font-family: 'Quicksand', sans-serif;">Lưu Key</button>
+        </div>
+
         <main class="main-content">
 
             <!-- Left Column: JD Input -->
